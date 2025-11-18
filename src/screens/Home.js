@@ -20,6 +20,19 @@ export default function Home({ navigation }) {
       <TouchableOpacity style={styles.btnSecondary} onPress={logout}>
         <Text style={{color:'#fff'}}>Logout</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+          style={{
+              backgroundColor: "#007bff",
+              padding: 15,
+              borderRadius: 12,
+              marginTop: 20,
+            }}
+          onPress={() => navigation.navigate("CarList")}
+      >
+        <Text style={{ color: "white", textAlign: "center", fontSize: 18 }}>
+            Manage Cars
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
