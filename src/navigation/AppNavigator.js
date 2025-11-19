@@ -7,7 +7,8 @@ import Settings from "../screens/Settings";
 import CarList from "../screens/CarList";
 import CarForm from "../screens/CarForm";
 import CarDetails from "../screens/CarDetails";
-
+import DriverMonitoring from "../screens/DriverMonitoring";
+import Analytics from "../screens/Analytics";
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,8 @@ export default function AppNavigator() {
       <Stack.Screen name="CarList" component={CarList} />
       <Stack.Screen name="CarForm" component={CarForm} />
       <Stack.Screen name="CarDetails" component={CarDetails} />
+      <Stack.Screen name="DriverMonitoring" component={DriverMonitoring} />
+      <Stack.Screen name="Analytics" component={Analytics} />
     </Stack.Navigator>
   );
 }
