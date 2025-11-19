@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { login as apiLogin, register as apiRegister } from "../services/authService";
+import userService from "../services/userService"; 
 import { storeToken, getToken, removeToken } from "../utils/storage";
 
 export const AuthContext = createContext();
@@ -12,7 +13,16 @@ export function AuthProvider({ children }) {
     async function bootstrap() {
       const token = await getToken();
       if (token) {
-        setUser({ token });
+        try {
+          const userData = await userService.getProfile(token);
+          setUser({ 
+            ...userData,
+            token 
+          });
+        } catch (error) {
+          console.log("Failed to fetch user profile:", error);
+          setUser({ token });
+        }
       }
       setLoading(false);
     }
@@ -25,11 +35,13 @@ export function AuthProvider({ children }) {
       console.log("Login response:", res.data);
       
       if (res?.data?.access_token) {
-        await storeToken(res.data.access_token);
+        const token = res.data.access_token;
+        await storeToken(token);
+        
+        const userData = await userService.getProfile(token);
         setUser({ 
-          email, 
-          token: res.data.access_token,
-          id: res.data.user?.id 
+          ...userData,
+          token 
         });
         return true;
       }
@@ -46,11 +58,13 @@ export function AuthProvider({ children }) {
       console.log("Register response:", res.data);
       
       if (res?.data?.access_token) {
-        await storeToken(res.data.access_token);
+        const token = res.data.access_token;
+        await storeToken(token);
+        
+        const userData = await userService.getProfile(token);
         setUser({ 
-          email, 
-          token: res.data.access_token,
-          id: res.data.user?.id 
+          ...userData,
+          token 
         });
         return true;
       }
@@ -66,8 +80,34 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUserProfile = async (updates) => {
+    try {
+      const updatedUser = await userService.updateProfile(updates, user.token);
+      setUser(prevUser => ({
+        ...prevUser,
+        ...updatedUser
+      }));
+      return true;
+    } catch (error) {
+      console.log("Update profile error:", error);
+      return false;
+    }
+  };
+
+  const getDisplayName = () => {
+    return user?.full_name || user?.email || "User";
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      register, 
+      logout, 
+      loading,
+      updateUserProfile, 
+      getDisplayName
+    }}>
       {children}
     </AuthContext.Provider>
   );
